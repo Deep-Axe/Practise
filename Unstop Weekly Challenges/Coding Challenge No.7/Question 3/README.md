@@ -2,10 +2,11 @@
 
 In a quiet village, a wise elder named Elora tasked the young villagers with an unusual challenge to test their teamwork and mathematical skills. Here's the challenge:\
 The villagers were divided into groups of k, where k is a number chosen at random. Each group had to calculate the average number of seeds in the apples they get. However, the task had an odd twist:\
-    1. If the average number of seeds per group was an even number, they would place the average into a golden pouch(linked list) for the village's ceremonial tree planting.\
-    2. If the average was an odd number, the seeds were discarded, and the group moved on.\
-    3. If there were fewer apples left than the group size k, they were to simply collect all the remaining apples and add their seeds to the pouch as they were, without calculating any average.\
+1. If the average number of seeds per group was an even number, they would place the average into a golden pouch(linked list) for the village's ceremonial tree planting.\
+2. If the average was an odd number, the seeds were discarded, and the group moved on.\
+3. If there were fewer apples left than the group size k, they were to simply collect all the remaining apples and add their seeds to the pouch as they were, without calculating any average.\
 Can you determine the final list (linked list) of seeds in the golden pouch based on this challenge?\
+
 ***<ins>Note</ins>:*** To add more structure to the challenge, the groups were required to move in a straight line. This meant the first group would take the first k apples, complete their task, and place their result in the pouch before the second group started with the next k apples, and so on.\
 ***<ins>Note</ins>:*** You have to take the floor of average\
 
