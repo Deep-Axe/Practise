@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="application/javascript">
+            function checkdata(){
+                var user  = document.getElementById("name");
+                var email_addr = document.getElementById("email");;
+
+                if(user.value == ""){
+                    alert("Please enter the name");
+                    username.focus();
+                    return false;
+
+                }
+                if (email_addr.value == ""){
+                    alert("Please enter the email");
+                    email_addr.focus();
+                    return false;
+                }
+                return true;
+            }
+        </script>
+        <title>Contact Details</title>
+    </head>
+    <body>
+        <h2>Enter contact details: </h2><br>
+        <form id="form1"  onsubmit="return checkdata()">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name">
+            <br><br>
+            <label for="email">Email Address:</label>
+            <input type="text" id="email" name="email">
+            <br><br>
+            <input type="submit" value="Submit">
+            <input type="reset" value="Reset">
+        </form>
+    </body>
+</html>
