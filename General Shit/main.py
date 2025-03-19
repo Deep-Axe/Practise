@@ -233,34 +233,63 @@ def SetSession(fingerprint):
 
     with open(f'{AppDirectory}Configuration/App.json', 'w') as file:
         json.dump(config, file)
-
-def network_auth_callback(source_ip, hostname, websocket):
+main_event_loop = None
+def network_auth_callback(source_ip, hostname):
     """
     Callback function for handling network authentications
     
     Called when a network broadcast is received with a matching user key hash
     """
+    global main_event_loop
     try:
         SystemLog(f"Received valid authentication from {hostname} ({source_ip})")
         
-        if hasattr(ApplicationSession, 'ApplicationInterfaceSocket'):
+        if not hasattr(ApplicationSession, 'pending_network_auths'):
+            ApplicationSession.pending_network_auths = []
             
+        ApplicationSession.pending_network_auths.append({
+            'source_ip': source_ip,
+            'hostname': hostname,
+            'timestamp': datetime.now().strftime('%H:%M:%S')
+        })
+        
+        if hasattr(ApplicationSession, 'ApplicationInterfaceSocket') and main_event_loop:
+
             asyncio.run_coroutine_threadsafe(
-                websocket.send(json.dumps({
+                deliver_network_auth_notification(ApplicationSession.ApplicationInterfaceSocket),
+                main_event_loop
+            )
+        else:
+            SystemLog("Socket not ready or event loop not available - authentication notification queued")
+    except Exception as e:
+        SystemLog(f"Error handling network authentication: {e}")
+        
+async def deliver_network_auth_notification(websocket):
+    """Helper function to deliver network auth notifications via websocket"""
+    try:
+        if hasattr(ApplicationSession, 'pending_network_auths') and ApplicationSession.pending_network_auths:
+            
+            auth = ApplicationSession.pending_network_auths.pop(0)
+            
+            if websocket.open: 
+                message = json.dumps({
                     'Action': {'Response': 'NetworkAuthentication'}, 
                     'Transfer': {
                         'Code': '25', 
                         'UserAuthentication': True,
                         'AuthType': 'Network',
-                        'Source': f"Device {hostname} ({source_ip})",
-                        'Message': "Network device with matching user credentials authenticated"
+                        'Source': f"Device {auth['hostname']} ({auth['source_ip']})",
+                        'Message': "Network device with matching user credentials authenticated",
+                        'Timestamp': auth['timestamp']
                     }
-                })),
-                asyncio.get_event_loop()
-            )
-            
+                })
+                
+                await websocket.send(message)
+                SystemLog(f"Successfully sent network auth notification")
+            else:
+                SystemLog("Websocket closed - couldn't deliver notification")
     except Exception as e:
-        SystemLog(f"Error handling network authentication: {e}")
+        SystemLog(f"Error delivering network auth notification: {e}")
 
 
 def RestoreSession():
